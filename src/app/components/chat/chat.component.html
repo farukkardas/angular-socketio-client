@@ -1,0 +1,98 @@
+<div class="container-fluid">
+    <div class="d-flex justify-content-center mb-5 mt-3">
+        <h1> Chat Application</h1>
+    </div>
+    <div class="row mb-5">
+        <div class="col-lg-10 col-sm-10 col-md-8">
+            <ul class="nav  m-2 scrollable-nav" id="proposalTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button #allChatButton class="nav-link active" id="all-chat-tab" data-bs-toggle="pill"
+                        data-bs-target="#all-chat" type="button" role="tab" aria-controls="all-chat"
+                        aria-selected="true">All Chat</button>
+                </li>
+                <li *ngFor="let message of specialMessages" class="nav-item" role="presentation">
+                    <button (click)="setActiveUser(message.user!)" class="nav-link" id="private-chat-tab"
+                        data-bs-toggle="pill" data-bs-target="#private-chat" type="button" role="tab"
+                        aria-controls="operators" aria-selected="false">{{message.user?.username}}
+                        <button style="border: none;" (click)="closePrivateChat(message)" type="button" class="close"
+                            aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button></button>
+                </li>
+            </ul>
+            <div class="d-flex flex-column  message-box border" style="min-height: 600px;">
+                <div class="tab-content" id="proposalTabContent">
+                    <div class="tab-pane fade show active" id="all-chat" role="tabpanel" aria-labelledby="all-chat-tab">
+                        <!-- Overview Component -->
+                        <div class="row" style="min-height: 550px;">
+                            <div class="d-flex flex-column">
+                                <div *ngFor="let message of messageList" class="chat-box">
+                                    <div [ngClass]="message.id == myId ? 'local-chat-message' : 'all-chat-message'">
+                                        <span class="username">
+                                            {{message.username
+                                            | titlecase}}:
+                                            <span class="message">&nbsp;{{message.message}}</span>
+                                        </span>
+                                        <div class="time-zone"> <span class="sent-time">
+                                                {{message.sentTime | date:'h:mm a'}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex mt-3 ms-2 mb-2">
+                            <input (keydown.enter)="sendMessage()" [(ngModel)]="messageInput" type="text"
+                                class="send-input">
+                            <button (click)="sendMessage()" class="btn btn-primary send-button me-2">Send</button>
+                        </div>
+                    </div>
+                    <!-- Private chat tabs -->
+                    <div class="tab-pane fade" id="private-chat" role="tabpanel" aria-labelledby="private-chat">
+                        <div class="row" style="min-height: 550px;">
+                            <div class="d-flex flex-column">
+                                <div *ngFor="let message of activeTabMessages" class="chat-box">
+                                    <div [ngClass]="message.id == myId ? 'local-chat-message' : 'all-chat-message'">
+                                        <span class="username">
+                                            {{message.username
+                                            | titlecase}}:
+                                            <span class="message">&nbsp;{{message.message}}</span>
+                                        </span>
+                                        <div class="time-zone"> <span class="sent-time">
+                                                {{message.sentTime | date:'h:mm a'}}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-flex mt-3 ms-2 mb-2">
+                            <input (keydown.enter)="sendPrivateMessage()" [(ngModel)]="privateMessageInput" type="text"
+                                class="send-input">
+                            <p *ngIf="isDisconnected()" class="text-danger">User is disconnected!</p>
+                            <button (click)="sendPrivateMessage()" [disabled]="isDisconnected()"
+                                class="btn btn-primary send-button me-2">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div class="col-lg-2 col-sm-2 col-md-4 mt-2">
+            <div class="flex-container border mt-5">
+                <h3 class="text-center mt-2 mb-3">Users</h3>
+                <div *ngFor="let user of userList" class="dropdown">
+                    <button class="user-dropdown  ms-2 mb-2" type="button" id="dropdownMenuButton2"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                        <img class="p-1" src="assets/img/user-active.png" alt="" width="20px">
+                        <span>{{user.username}} <span *ngIf="user.id == this.socket.ioSocket.id"> (You) </span></span>
+                    </button>
+                    <ul class="dropdown-menu" *ngIf="user.id != this.socket.ioSocket.id"
+                        aria-labelledby="dropdownMenuButton2">
+                        <li><button (click)="createNewPrivateMessageTab(user)" class="dropdown-item">Send
+                                Message</button></li>
+                        <li><button class="dropdown-item">Add to Friends</button></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
